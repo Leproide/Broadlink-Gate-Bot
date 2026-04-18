@@ -1,0 +1,20 @@
+# Secrets — NEVER commit these
+broadlink_codes.json
+gate_bot.log
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

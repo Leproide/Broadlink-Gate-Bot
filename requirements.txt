@@ -1,0 +1,2 @@
+broadlink>=0.19
+requests>=2.28
