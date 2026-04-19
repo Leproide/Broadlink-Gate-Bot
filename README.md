@@ -118,7 +118,7 @@ python gate_bot.py
 {
   "users": [
     1363844,
-    1650718330,
+    1253418323,
     987654321
   ]
 }
@@ -196,6 +196,18 @@ If your gate uses a rolling code (the transmitted code changes every press — c
 
 - [`python-broadlink`](https://github.com/mjg59/python-broadlink) by Matthew Garrett and contributors — the library that makes all of this possible.
 
+## Screenshot
+
+### Admin side:
+
+<img width="569" height="1280" alt="1_GateBot" src="https://github.com/user-attachments/assets/22d9b917-8a3e-49ae-8e54-ee2caa3312d5" />
+
+<img width="575" height="1280" alt="GateBot_Grant" src="https://github.com/user-attachments/assets/1ea3308e-1628-4ca2-85d6-02e49977f838" />
+
+### Users side:
+
+<img width="576" height="1280" alt="GateBot_Request" src="https://github.com/user-attachments/assets/44f03509-8763-4bcb-9d60-c21e360caf72" />
+
 ## License
 
-GPL v2
+GPL v2 
