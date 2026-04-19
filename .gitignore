@@ -1,14 +1,10 @@
-# Secrets — NEVER commit these
-broadlink_codes.json
-gate_bot.log
-*.env
-
 # Python
 __pycache__/
 *.py[cod]
-*.egg-info/
-.venv/
+*.so
 venv/
+.venv/
+env/
 
 # IDE
 .vscode/
@@ -18,3 +14,12 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# Project — contains secrets/state, do not commit
+broadlink_codes.json
+authorized_users.json
+gate_bot.log
+
+# Anything with tokens/secrets in the name
+*token*
+*secret*
