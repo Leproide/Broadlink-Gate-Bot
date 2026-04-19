@@ -35,6 +35,7 @@ LOG_FILE   = os.path.join(_SCRIPT_DIR, "gate_bot.log")
 # Find your chat id by messaging @userinfobot on Telegram.
 INITIAL_AUTHORIZED = [
     123456789,   # ADMIN — first user receives access requests
+    # 987654321, # other authorized users
 ]
 
 # Text triggers that open the gate (case-insensitive)
@@ -204,6 +205,48 @@ def tg_edit_message(chat_id, message_id, text):
                       timeout=10)
     except Exception as e:
         log(f"ERROR Telegram edit: {e}")
+
+
+def tg_set_commands():
+    """Register the bot's slash-commands list.
+
+    Telegram shows this as the blue "Menu" button next to the message input
+    (server-side UI, cannot be hidden by the user).
+    """
+    try:
+        commands = [
+            {"command": "menu",    "description": "Show the keyboard menu"},
+            {"command": "open",    "description": "Open the gate"},
+            {"command": "request", "description": "Request access"},
+            {"command": "help",    "description": "Show help"},
+        ]
+        r = requests.post(
+            f"{TG_URL}/setMyCommands",
+            json={"commands": commands},
+            timeout=10,
+        )
+        if r.json().get("ok"):
+            log(f"✓ Commands registered: {[c['command'] for c in commands]}")
+        else:
+            log(f"⚠ setMyCommands failed: {r.json()}")
+    except Exception as e:
+        log(f"ERROR setMyCommands: {e}")
+
+
+def tg_set_menu_button():
+    """Force the 'Menu' button to show the commands list for every chat."""
+    try:
+        r = requests.post(
+            f"{TG_URL}/setChatMenuButton",
+            json={"menu_button": {"type": "commands"}},
+            timeout=10,
+        )
+        if r.json().get("ok"):
+            log("✓ Menu button set to 'commands'")
+        else:
+            log(f"⚠ setChatMenuButton failed: {r.json()}")
+    except Exception as e:
+        log(f"ERROR setChatMenuButton: {e}")
 
 
 def tg_get_updates(offset):
@@ -419,12 +462,19 @@ def handle_message(msg):
                 reply_markup=keyboard_request_only())
         return
 
-    # /start /help → show menu
-    if text_low in ("/start", "/help"):
+    # /open → open the gate directly
+    if text_low == "/open":
+        do_open(chat_id, user)
+        return
+
+    # /start /help /menu → (re)show menu
+    if text_low in ("/start", "/help", "/menu", "menu", "menù"):
         tg_send(chat_id,
                 "🚪 <b>Gate Bot</b>\n\n"
-                "Use the menu below, or type one of these:\n"
-                + "\n".join(f"• <code>{k}</code>" for k in KEYWORDS),
+                "Use the menu below, the blue <b>Menu</b> button,\n"
+                "or type one of these:\n"
+                + "\n".join(f"• <code>{k}</code>" for k in KEYWORDS)
+                + "\n\nIf the keyboard disappears, send /menu to bring it back.",
                 reply_markup=keyboard_main())
         return
 
@@ -434,7 +484,9 @@ def handle_message(msg):
         return
 
     # Anything else: just re-show the menu
-    tg_send(chat_id, "Use the menu below 👇", reply_markup=keyboard_main())
+    tg_send(chat_id,
+            "Use the menu below 👇 (send /menu if it disappears)",
+            reply_markup=keyboard_main())
 
 
 # ── MAIN LOOP ─────────────────────────────────────────────────
@@ -478,6 +530,10 @@ def main():
     except Exception as e:
         log(f"✗ Cannot reach Telegram: {e}")
         return
+
+    # Register slash-commands + force the Menu button to show them
+    tg_set_commands()
+    tg_set_menu_button()
 
     log("Listening for messages...")
 
